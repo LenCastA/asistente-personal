@@ -1,3 +1,5 @@
+from tkinter import *
+from PIL import Image, ImageTk
 import speech_recognition as sr
 from pyttsx3 import init
 from pywhatkit import search, playonyt, sendwhatmsg
@@ -10,7 +12,22 @@ import errno
 from subprocess import run, Popen
 from pyautogui import hotkey
 from random import choice
-from tkinter import *
+# Ventana principal
+main_window = Tk()
+main_window.title('Asistente Virtual')
+
+main_window.iconbitmap('recurses/av1.ico')
+main_window.geometry('1200x650')
+main_window.resizable(True, True)
+main_window.config(bg = '#2C5364')
+
+# Label e imagen del asistente
+label_title = Label(main_window, text = 'Asistente Virtual', bg = '#2C5364', fg = '#E0E0E0', font = ('Arial', 30, 'bold'))
+label_title.pack(pady = 10)
+
+microphoto = ImageTk.PhotoImage(Image.open('recurses/main.png'))
+windows_photo = Label(main_window, image = microphoto)
+windows_photo.pack(pady = 5)
 
 # Variables del bot
 name = 'cortana'
@@ -33,6 +50,7 @@ def cmd(commando):
 
 # Funcion para que me oiga y reconozca
 def listen():
+    global rec
     try:
         with sr.Microphone(device_index=1) as micro:
             print('Escuchando...')
@@ -48,7 +66,7 @@ def listen():
     return rec
 
 # Diccionarios y listas
-saludos = ['buenos días', 'buenas tardes', 'buenas noches', 'hola', 'qué onda', 'cómo andas', 'qué tal', 'que tal']
+saludo = ['buenos días', 'buenas tardes', 'buenas noches', 'hola', 'qué onda', 'cómo andas', 'qué tal', 'que tal']
 sites = {
     'google' : 'google.com',
     'facebook' : 'facebook.com',
@@ -187,7 +205,7 @@ def run_assist():
         final_rec_saludo = rec.strip()
         saludos_bot = ['Hola, cómo andas', 'Qué tal, Lenin', '¡Hey, hola!',
                        'Hola, espero tengas o hayas tenido un buen día']
-        for i in saludos:
+        for i in saludo:
             final_saludos_bot = choice(saludos_bot)
             if i.strip() == final_rec_saludo:
                 talk(final_saludos_bot)
@@ -195,18 +213,12 @@ def run_assist():
     else:
         talk('Lo siento no tengo alguna respuesta para eso')
         print('Lo siento no tengo alguna respuesta para eso')
+# Boton
+boton1 = Button(main_window, text = 'Iniciar', command = run_assist)
+boton1.pack(pady = 10)
 
-# Interfaz
-# def interfaz():
-#     root = Tk()
-#
-#     root.iconbitmap('recurses/av1.ico')  # Icono de la ventana
-#     root.config(bg='gray57')  # Color de fondo
-#     root.title('Asistente Virtual Personal')
-#     root.geometry('1366x720')
-#
-#     img = PhotoImage(file='recurses/main.png')
-#     botonNuevo1 = Button(root, image=img, compound="top", command=run_assist)
-#     botonNuevo1.place(x=400, y=100)
-#
-#     root.mainloop()
+# Label con texto variable de rec
+label_variable = Label(main_window, text = 'prueba 1', bg = '#2C5364', fg = '#E0E0E0', font = ('Arial', 16, 'bold'))
+label_variable.pack(pady = 10)
+
+main_window.mainloop()
