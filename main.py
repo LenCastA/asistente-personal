@@ -5,12 +5,11 @@ import datetime as dt
 from wikipedia import page, summary, set_lang
 from time import sleep
 from webbrowser import open_new_tab
-from os import rmdir, mkdir
+from os import rmdir, mkdir, linesep
 import errno
-from subprocess import run
+from subprocess import run, Popen
 from pyautogui import hotkey
 from random import choice
-from tkinter import *
 
 # Variables del bot
 name = 'cortana'
@@ -22,17 +21,14 @@ engine = init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[3].id)
 
-
 # Funcion hablar
 def talk(text):
     engine.say(text)
     engine.runAndWait()
 
-
 # Funcion para ejecutar comandos del cmd
 def cmd(commando):
     run(commando, shell=True)
-
 
 # Funcion para que me oiga y reconozca
 def listen():
@@ -50,10 +46,37 @@ def listen():
         pass
     return rec
 
-
-# Lista de saludos
+# Diccionarios y listas
 saludo = ['buenos días', 'buenas tardes', 'buenas noches', 'hola', 'qué onda', 'cómo andas', 'qué tal', 'que tal']
+sites = {
+    'google' : 'google.com',
+    'facebook' : 'facebook.com',
+    'youtube' : 'youtube.com',
+    'whatsapp' : 'web.whatsapp.com'
+}
 
+folders = {
+    'lenin' : r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\Lenin',
+    'programar' : r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\programar',
+    'cuarto de secundaria' : r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\CuartoDeSecundaria'
+}
+
+programs = {
+    'el navegador' : r'start msedge.exe',
+    'epic' : r'D:\Games\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe',
+    'discord' : r'C:\Users\Lenin Castro\AppData\Local\Discord\app-1.0.9001\Discord.exe',
+    'juego otaku' : r'D:\Games\Genshin Impact\launcher.exe',
+    'vs code' : r'C:\Users\Lenin Castro\AppData\Local\Programs\Microsoft VS Code\Code.exe',
+    'editor de código de python' : r'D:\Program Files\PyCharm Community Edition 2021.1.1\bin\pycharm64.exe'
+}
+
+def write(f):
+    talk('¿Qué quieres que escriba?')
+    rec_write = listen()
+    f.write(rec_write + linesep)
+    f.close()
+    talk('Listo, puedes revisarlo')
+    Popen(r'C:\Users\Lenin Castro\Desktop\nota.txt', shell = True)
 
 # Funcion para que corra el bot
 def run_assist():
@@ -69,7 +92,8 @@ def run_assist():
     elif 'busca en wikipedia' in rec:  # Buscar algo en Wikipedia
         set_lang("es")
         order = rec.replace('busca en wikipedia', '')
-        info = summary(order, 2)
+        order = order.strip()
+        info = summary(order, 1)
         talk('Buscando' + order + 'en Wikipedia')
         sleep(1)
         open_new_tab(page(order).url)
@@ -90,49 +114,34 @@ def run_assist():
     elif 'abre' in rec:  # Abrir Carpetas o programas
         open_program = rec.replace('abre', '')
         final_open = open_program.strip()
-        list = ['lenin', 'el navegador', 'epic', 'programar', 'discord', 'cuarto de secundaria', 'juego otaku',
-                'vs code', 'editor de código de python']
 
-        if list[0] == final_open:
-            commando = r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\Lenin'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[1] == final_open:
-            commando = r'start msedge.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[2] == final_open:
-            commando = r'D:\Games\Epic Games\Launcher\Portal\Binaries\Win32\EpicGamesLauncher.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[3] == final_open:
-            commando = r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\programar'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[4] == final_open:
-            # Se pone la r antes de la ruta porque si no marca error.
-            commando = r'C:\Users\Lenin Castro\AppData\Local\Discord\app-1.0.9001\Discord.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[5] == final_open:
-            commando = r'start %windir%\explorer.exe D:\Lenin Castro\Carpetas de Escritorio\CuartoDeSecundaria'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[6] == final_open:
-            commando = r'D:\Games\Genshin Impact\launcher.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[7] == final_open:
-            commando = r'C:\Users\Lenin Castro\AppData\Local\Programs\Microsoft VS Code\Code.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
-        elif list[8] == final_open:
-            commando = r'D:\Program Files\PyCharm Community Edition 2021.1.1\bin\pycharm64.exe'
-            cmd(commando)
-            talk(f'Abriendo {final_open}')
+        if sites.get(final_open) or folders.get(final_open) or programs.get(final_open) is not None:
+            for site in sites:
+                if site in rec:
+                    comando = f'start msedge.exe {sites[site]}'
+                    cmd(comando)
+                    talk(f'Abriendo {site}')
+            for program in programs:
+                if program in rec:
+                    comando = programs[program]
+                    cmd(comando)
+                    talk(f'Abriendo {program}')
+            for folder in folders:
+                if folder in rec:
+                    comando = folders[folder]
+                    cmd(comando)
+                    talk(f'Abriendo {folder}')
         else:
             print(f'No existe el programa o carpeta {final_open}')
             talk(f'No existe el programa o carpeta {final_open}')
+
+    elif 'escribe' in rec: # Escribir en el bloc de notas
+        try:
+            with open(r'C:\Users\Lenin Castro\Desktop\nota.txt', 'a') as f:
+                write(f)
+        except FileNotFoundError:
+            file = (r'C:\Users\Lenin Castro\Desktop\nota.txt', 'w')
+            write(file)
 
     elif 'crea una carpeta llamada' in rec:  # Crear carpeta
         name_cap = rec.replace('crea una carpeta llamada', '')
@@ -161,6 +170,7 @@ def run_assist():
         except:
             print('No hay ninguna carpeta llamada así')
             talk('No hay ninguna carpeta llamada así')
+
     elif 'captura' in rec:  # Capturar pantalla
         try:
             hotkey('shift', 'printscreen')
@@ -172,7 +182,7 @@ def run_assist():
         except:
             pass
     # Saludar
-    elif 'buenos días' or 'buenas tardes' or 'buenas noches' or 'hola' or 'qué onda' or 'cómo andas' or 'qué tal' or 'que tal' in rec:
+    elif 'buenos días' or 'buenas tardes' or 'buenas noches' or 'hola' or 'qué onda' or 'cómo andas' or 'qué tal' in rec:
         final_rec_saludo = rec.strip()
         saludos_bot = ['Hola, cómo andas', 'Qué tal, Lenin', '¡Hey, hola!',
                        'Hola, espero tengas o hayas tenido un buen día']
@@ -184,20 +194,3 @@ def run_assist():
     else:
         talk('Lo siento no tengo alguna respuesta para eso')
         print('Lo siento no tengo alguna respuesta para eso')
-
-
-def interfaz():
-    root = Tk()
-
-    root.iconbitmap('recurses/av1.ico')  # Icono de la ventana
-    root.config(bg='gray57')  # Color de fondo
-    root.title('Asistente Virtual Personal')
-    root.geometry('1366x720')
-
-    img = PhotoImage(file='recurses/main.png')
-    botonNuevo1 = Button(root, image=img, compound="top", command=run_assist)
-    botonNuevo1.place(x=400, y=100)
-
-    root.mainloop()
-
-interfaz()
