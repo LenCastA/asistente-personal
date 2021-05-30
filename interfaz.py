@@ -12,22 +12,6 @@ import errno
 from subprocess import run, Popen
 from pyautogui import hotkey
 from random import choice
-# Ventana principal
-main_window = Tk()
-main_window.title('Asistente Virtual')
-
-main_window.iconbitmap('recurses/av1.ico')
-main_window.geometry('1200x650')
-main_window.resizable(True, True)
-main_window.config(bg = '#2C5364')
-
-# Label e imagen del asistente
-label_title = Label(main_window, text = 'Asistente Virtual', bg = '#2C5364', fg = '#E0E0E0', font = ('Arial', 30, 'bold'))
-label_title.pack(pady = 10)
-
-microphoto = ImageTk.PhotoImage(Image.open('recurses/main.png'))
-windows_photo = Label(main_window, image = microphoto)
-windows_photo.pack(pady = 5)
 
 # Variables del bot
 name = 'cortana'
@@ -53,6 +37,7 @@ def listen():
     global rec
     try:
         with sr.Microphone(device_index=1) as micro:
+            talk('Te escucho...')
             print('Escuchando...')
             voice = listener.listen(micro)
             rec = listener.recognize_google(voice, language='es-ES')
@@ -213,12 +198,70 @@ def run_assist():
     else:
         talk('Lo siento no tengo alguna respuesta para eso')
         print('Lo siento no tengo alguna respuesta para eso')
-# Boton
-boton1 = Button(main_window, text = 'Iniciar', command = run_assist)
+
+# INTERFAZ GRÁFICA
+comandos = """ 
+Comandos que puedes usar:
+- Reproduce..(canción)
+- Busca... (algo)
+- Envía un mensaje diciendo... (mensaje)
+- Busca en wikipedia...(algo)
+- Abre...(web, programa o carpeta)
+- Escribe... (la nota)
+- Crea una carpeta llamada... (nombre)
+- Elimina la carpeta llamada... (nombre)
+- Toma una captura
+- Qué hora es
+- Termina
+"""
+# Ventana principal
+main_window = Tk()
+main_window.title('Asistente Virtual')
+
+main_window.iconbitmap('recurses/av1.ico')
+main_window.geometry('1366x720')
+main_window.resizable(True, True)
+main_window.config(bg = '#2C5364')
+
+# Label e imagen del asistente
+label_title = Label(main_window, text = 'Asistente Virtual', bg = '#2C5364', fg = '#E0E0E0', font = ('Arial', 30, 'bold'))
+label_title.pack(pady = 10)
+
+microphoto = ImageTk.PhotoImage(Image.open('recurses/main1.png'))
+windows_photo = Label(main_window, image = microphoto, height = 500, width = 500).pack(pady = 10)
+
+# Lista de comandos
+listaComandos = Canvas(bg = '#2C5364', height = 300, width = 400)
+listaComandos.place(x = 0, y = 0)
+listaComandos.create_text(190, 140, text = comandos, fill = 'white', font = 'Arial 15')
+
+# Donde se mostrará lo que digo y lo que el bot dice
+text_info =Text(main_window, bg = '#2C5364', fg = 'white', bd = 2, font = ('Arial', 15))
+text_info.place(x = 0, y = 306, height = 300, width = 404)
+
+# Botones
+boton1 = Button(main_window, text = 'Iniciar', width = 10, font = ('Arial', 16))
 boton1.pack(pady = 10)
 
-# Label con texto variable de rec
-label_variable = Label(main_window, text = 'prueba 1', bg = '#2C5364', fg = '#E0E0E0', font = ('Arial', 16, 'bold'))
-label_variable.pack(pady = 10)
+boton_hablar = Button(main_window, text="Hablar", bg='#b6fbff', fg="black", font=('Arial', 16, 'bold'))
+boton_hablar.place(x=1100, y=100, height=40, width=150)
+
+boton_archivos = Button(main_window, text="Agregar archivos", bg='#16222A', fg="white", font=('Arial', 16, 'bold'))
+boton_archivos.place(x=1075, y=150, height=40, width=200)
+
+boton_webs = Button(main_window, text="Agregar páginas", bg='#16222A', fg="white", font=('Arial', 16, 'bold'))
+boton_webs.place(x=1075, y=200, height=40, width=200)
+
+boton_programs = Button(main_window, text="Agregar programas", bg='#16222A', fg="white", font=('Arial', 16, 'bold'))
+boton_programs.place(x=1075, y=250, height=40, width=200)
+
+boton_add_files = Button(main_window, text="Archivos agregados", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_files.place(x=1075, y=300, height=40, width=200)
+
+boton_add_webs = Button(main_window, text="Páginas agregadas", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_webs.place(x=1075, y=350, height=40, width=200)
+
+boton_add_programs = Button(main_window, text="Apps agregadas", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_programs.place(x=1075, y=400, height=40, width=200)
 
 main_window.mainloop()

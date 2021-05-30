@@ -15,7 +15,6 @@ from tkinter import *
 # Variables del bot
 name = 'cortana'
 listener = sr.Recognizer()
-
 engine = init()
 
 # Voz del bot
@@ -35,6 +34,7 @@ def cmd(commando):
 def listen():
     try:
         with sr.Microphone(device_index=1) as micro:
+            talk('Te escucho...')
             print('Escuchando...')
             voice = listener.listen(micro)
             rec = listener.recognize_google(voice, language='es-ES')
