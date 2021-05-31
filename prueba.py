@@ -36,11 +36,11 @@ def add_web_graph():
     main_window.eval(f'tk::PlaceWindow {str(file_win)} center')
     title_label = Label(file_win, text="Agrega una web", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
     text_name = Label(file_win, text="Nombre de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
-    namef_entry = Entry(file_win)
-    namef_entry.pack(pady=2)
+    namew_entry = Entry(file_win)
+    namew_entry.pack(pady=2)
     text_rute = Label(file_win, text="Link de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
-    rutef_entry = Entry(file_win, width=30)
-    rutef_entry.pack(pady=2)
+    rutew_entry = Entry(file_win, width=30)
+    rutew_entry.pack(pady=2)
     Button(file_win, text="Agregar", bg='#16222A', fg="white", width=10, height=1).pack(pady=5)
 
 def add_program_graph():
@@ -53,12 +53,15 @@ def add_program_graph():
     main_window.eval(f'tk::PlaceWindow {str(file_win)} center')
     title_label = Label(file_win, text="Agrega un programa", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
     text_name = Label(file_win, text="Nombre del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
-    namef_entry = Entry(file_win)
-    namef_entry.pack(pady=2)
+    namep_entry = Entry(file_win)
+    namep_entry.pack(pady=2)
     text_rute = Label(file_win, text="Ruta del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
-    rutef_entry = Entry(file_win, width=30)
-    rutef_entry.pack(pady=2)
+    rutep_entry = Entry(file_win, width=30)
+    rutep_entry.pack(pady=2)
     Button(file_win, text="Agregar", bg='#16222A', fg="white", width=10, height=1).pack(pady=5)
+
+def add_file():
+
 
 comandos = """ 
 Comandos que puedes usar:
