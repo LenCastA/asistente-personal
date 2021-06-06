@@ -32,13 +32,20 @@ def talk(text):
 def cmd(commando):
     run(commando, shell=True)
 
+def write_text(textc):
+    text_info.insert(INSERT, textc + linesep)
+
+def read_talk():
+    text = text_info.get('1.0', 'end')
+    talk(text)
+
 # Funcion para que me oiga y reconozca
 def listen():
     global rec
     try:
         with sr.Microphone(device_index=1) as micro:
+            write_text('Escuchando...')
             talk('Te escucho...')
-            print('Escuchando...')
             voice = listener.listen(micro)
             rec = listener.recognize_google(voice, language='es-ES')
             rec = rec.lower()
@@ -89,10 +96,12 @@ def run_assist():
     if 'reproduce' in rec:  # Reproduce algo en Youtube
         music = rec.replace('reproduce', ' ')
         talk('Reproduciendo' + music)
+        write_text('Reproduciendo' + music)
         playonyt(music)
     elif 'hora' in rec:  # Da la hora
         hora = dt.datetime.now().strftime('%H:%M ')
         talk('Son las' + hora)
+        write_text('Son las' + hora)
     elif 'busca en wikipedia' in rec:  # Buscar algo en Wikipedia
         set_lang("es")
         order = rec.replace('busca en wikipedia', '')
@@ -101,20 +110,25 @@ def run_assist():
         talk('Buscando' + order + 'en Wikipedia')
         sleep(1)
         open_new_tab(page(order).url)
+        write_text(info)
         talk(info)
     elif 'busca' in rec:  # Busca algo en google
         google = rec.replace('busca', '')
         search(google)
         talk('Buscando' + google)
+        write_text('Buscando' + google)
     elif 'envía un mensaje diciendo' in rec:  # Enviar mensaje por WhatsApp
         hour = int(dt.datetime.now().strftime('%H'))
         minute = int(dt.datetime.now().strftime('%M')) + 1.1
         whats = rec.replace('envía un mensaje diciendo', '')
         whats1 = str(whats)
         talk('¿A qué numero quieres enviar el mensaje?')
+        write_text('¿A qué numero quieres enviar el mensaje?')
         new = listen()
         phone_number = new.strip()
-        sendwhatmsg(f'+51{phone_number}', whats1, hour, minute, 8)
+        talk(f'Enviando mensaje a {phone_number}')
+        sendwhatmsg(f'+51{phone_number}', whats1, hour, minute, 10)
+        talk('Mensaje enviado...')
     elif 'abre' in rec:  # Abrir Carpetas o programas
         open_program = rec.replace('abre', '')
         final_open = open_program.strip()
@@ -125,18 +139,21 @@ def run_assist():
                     comando = f'start msedge.exe {sites[site]}'
                     cmd(comando)
                     talk(f'Abriendo {site}')
+                    write_text(f'Abriendo {site}')
             for program in programs:
                 if program in rec:
                     comando = programs[program]
                     cmd(comando)
                     talk(f'Abriendo {program}')
+                    write_text(f'Abriendo {program}')
             for folder in folders:
                 if folder in rec:
                     comando = folders[folder]
                     cmd(comando)
                     talk(f'Abriendo {folder}')
+                    write_text(f'Abriendo {folder}')
         else:
-            print(f'No existe el programa o carpeta {final_open}')
+            write_text(f'No existe el programa o carpeta {final_open}')
             talk(f'No existe el programa o carpeta {final_open}')
 
     elif 'escribe' in rec: # Escribir en el bloc de notas
@@ -156,6 +173,7 @@ def run_assist():
             talk('Creando carpeta')
             sleep(1)
             talk('Carpeta creada exitosamente')
+            write_text('Carpeta creada exitosamente')
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -166,13 +184,12 @@ def run_assist():
 
         try:
             rmdir(fr'C:\Users\Lenin Castro\Desktop\{final_name}')
-            print('Eliminando carpeta')
             talk('Eliminando carpeta')
             sleep(1)
-            print(f'Carpeta {final_name} eliminada correctamente')
+            write_text(f'Carpeta {final_name} eliminada correctamente')
             talk(f'Carpeta {final_name} eliminada correctamente')
         except:
-            print('No hay ninguna carpeta llamada así')
+            write_text('No hay ninguna carpeta llamada así')
             talk('No hay ninguna carpeta llamada así')
 
     elif 'captura' in rec:  # Capturar pantalla
@@ -183,6 +200,7 @@ def run_assist():
             talk('Realizando captura...')
             sleep(1)
             talk('Capturas hechas')
+            write_text('Capturas hechas')
         except:
             pass
     # Saludar
@@ -194,10 +212,10 @@ def run_assist():
             final_saludos_bot = choice(saludos_bot)
             if i.strip() == final_rec_saludo:
                 talk(final_saludos_bot)
-                print(final_saludos_bot)
+                write_text(final_saludos_bot)
     else:
         talk('Lo siento no tengo alguna respuesta para eso')
-        print('Lo siento no tengo alguna respuesta para eso')
+        write_text('Lo siento no tengo alguna respuesta para eso')
 
 # INTERFAZ GRÁFICA
 
@@ -240,13 +258,13 @@ listaComandos.create_text(190, 140, text=comandos, fill='white', font='Arial 15'
 text_info = Text(main_window, bg='#2C5364', fg='white', bd=2, font=('Arial', 15))
 text_info.place(x=0, y=306, height=300, width=404)
 
+# Saludo
+talk('Bienvenido Lenin...')
+
 # Funciones especiales de la interfaz
 def talk_anything():
     text = text_info.get("1.0", "end")
     talk(text)
-
-def write_text(textc):
-    text_info.insert(INSERT, textc)
 
 def add_folder_graph():
     global namef_entry, rutef_entry
@@ -256,11 +274,11 @@ def add_folder_graph():
     file_win.configure(bg="#434343")
     file_win.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(file_win)} center')
-    title_label = Label(file_win, text="Agrega un archivo", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
-    text_name = Label(file_win, text="Nombre del archivo", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Agrega una carpeta", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
+    Label(file_win, text="Nombre de la carpeta", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     namef_entry = Entry(file_win)
     namef_entry.pack(pady=2)
-    text_rute = Label(file_win, text="Ruta del archivo", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Ruta de la carpeta", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     rutef_entry = Entry(file_win, width=30)
     rutef_entry.pack(pady=2)
     Button(file_win, text="Agregar", bg='#16222A', fg="white", width=10, height=1, command = add_folder).pack(pady=5)
@@ -273,11 +291,11 @@ def add_web_graph():
     file_win.configure(bg="#434343")
     file_win.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(file_win)} center')
-    title_label = Label(file_win, text="Agrega una web", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
-    text_name = Label(file_win, text="Nombre de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Agrega una web", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
+    Label(file_win, text="Nombre de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     namew_entry = Entry(file_win)
     namew_entry.pack(pady=2)
-    text_rute = Label(file_win, text="Link de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Link de la web", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     rutew_entry = Entry(file_win, width=30)
     rutew_entry.pack(pady=2)
     Button(file_win, text="Agregar", bg='#16222A', fg="white", width=10, height=1, command = add_web).pack(pady=5)
@@ -290,11 +308,11 @@ def add_program_graph():
     file_win.configure(bg="#434343")
     file_win.resizable(0, 0)
     main_window.eval(f'tk::PlaceWindow {str(file_win)} center')
-    title_label = Label(file_win, text="Agrega un programa", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
-    text_name = Label(file_win, text="Nombre del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Agrega un programa", fg="white", bg="#434343", font=('Arial', 15, 'bold')).pack(pady=5)
+    Label(file_win, text="Nombre del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     namep_entry = Entry(file_win)
     namep_entry.pack(pady=2)
-    text_rute = Label(file_win, text="Ruta del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
+    Label(file_win, text="Ruta del programa", fg="white", bg="#434343", font=('Arial', 12, 'bold')).pack(pady=3)
     rutep_entry = Entry(file_win, width=30)
     rutep_entry.pack(pady=2)
     Button(file_win, text="Agregar", bg='#16222A', fg="white", width=10, height=1, command = add_program).pack(pady=5)
@@ -303,7 +321,7 @@ def save_files(file, name, route):
     try:
         with open(file, 'a') as f:
             f.write(name + "," + route + "\n")
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         file = open(file, 'a')
         file.write(name + "," + route + "\n")
 
@@ -331,14 +349,37 @@ def add_program():
     namep_entry.delete(0, "end")
     rutep_entry.delete(0, "end")
 
+def talk_folders():
+    if bool(folders) == True:
+        talk("Has agregado las siguientes carpetas")
+        for folder in folders:
+            talk(folder)
+    else:
+        talk("Aún no has agregado carpetas!")
+
+def talk_webs():
+    if bool(sites) == True:
+        talk("Has agregado los siguientes sitios web!")
+        for site in sites:
+            talk(site)
+    else:
+        talk("Aún no has agregado sitios web!")
+
+def talk_programs():
+    if bool(programs) == True:
+        talk("Has agregado las siguientes aplicaciones")
+        for program in programs:
+            talk(program)
+    else:
+        talk("Aún no has agregado aplicaciones!")
 # Botones
-boton1 = Button(main_window, text='Iniciar', width=10, font=('Arial', 16))
+boton1 = Button(main_window, text='Iniciar', width=10, font=('Arial', 16), command = run_assist)
 boton1.pack(pady=10)
 
-boton_hablar = Button(main_window, text="Hablar", bg='#b6fbff', fg="black", font=('Arial', 16, 'bold'))
+boton_hablar = Button(main_window, text="Hablar", bg='#b6fbff', fg="black", font=('Arial', 16, 'bold'), command = read_talk)
 boton_hablar.place(x=1100, y=100, height=40, width=150)
 
-boton_archivos = Button(main_window, text="Agregar archivos", bg='#16222A', fg="white", font=('Arial', 16, 'bold'), command=add_folder_graph)
+boton_archivos = Button(main_window, text="Agregar carpetas", bg='#16222A', fg="white", font=('Arial', 16, 'bold'), command=add_folder_graph)
 boton_archivos.place(x=1075, y=150, height=40, width=200)
 
 boton_webs = Button(main_window, text="Agregar páginas", bg='#16222A', fg="white", font=('Arial', 16, 'bold'), command=add_web_graph)
@@ -347,13 +388,13 @@ boton_webs.place(x=1075, y=200, height=40, width=200)
 boton_programs = Button(main_window, text="Agregar programas", bg='#16222A', fg="white", font=('Arial', 16, 'bold'), command=add_program_graph)
 boton_programs.place(x=1068, y=250, height=40, width=215)
 
-boton_add_files = Button(main_window, text="Archivos agregados", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_files = Button(main_window, text="Carpetas agregadas", bg='#474747', fg="white", font=('Arial', 14, 'bold'), command = talk_folders)
 boton_add_files.place(x=1075, y=300, height=40, width=200)
 
-boton_add_webs = Button(main_window, text="Páginas agregadas", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_webs = Button(main_window, text="Páginas agregadas", bg='#474747', fg="white", font=('Arial', 14, 'bold'), command = talk_webs)
 boton_add_webs.place(x=1075, y=350, height=40, width=200)
 
-boton_add_programs = Button(main_window, text="Programas agregados", bg='#474747', fg="white", font=('Arial', 14, 'bold'))
+boton_add_programs = Button(main_window, text="Programas agregados", bg='#474747', fg="white", font=('Arial', 14, 'bold'), command = talk_programs)
 boton_add_programs.place(x=1068, y=400, height=40, width=215)
 
 main_window.mainloop()
